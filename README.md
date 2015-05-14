@@ -5,6 +5,12 @@ Leverages React's contexts for passign dependencies automatically down the compo
 
 For a full-scale implementation reference, have a look at [IdiomaticReact](https://github.com/netgusto/IdiomaticReact).
 
+## Installation
+
+```bash
+$ npm install --save geiger
+```
+
 ## Usage
 
 ```javascript
