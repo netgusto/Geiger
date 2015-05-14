@@ -1,5 +1,5 @@
 # Geiger
-Tiny (<50 SLOC) flux implementation for ReactJS with Dependency Injection features
+Tiny (<50 SLOC) flux implementation for ReactJS with Dependency Injection features, with no dependencies.
 
 ## Usage
 
