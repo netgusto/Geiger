@@ -1,5 +1,5 @@
 {
-  "name": "Geiger",
+  "name": "geiger",
   "version": "1.0.0",
   "description": "Tiny (<50 SLOC) flux implementation for ReactJS with Dependency Injection features",
   "main": "dist/geiger.js",
