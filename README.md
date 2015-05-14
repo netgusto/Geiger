@@ -3,6 +3,8 @@ Tiny (<50 SLOC) flux implementation for ReactJS with Dependency Injection featur
 
 Leverages React's contexts for passign dependencies automatically down the component tree.
 
+For a full-scale implementation reference, have a look at [IdiomaticReact](https://github.com/netgusto/IdiomaticReact).
+
 ## Usage
 
 ```javascript
