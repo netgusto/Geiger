@@ -1,6 +1,8 @@
 # Geiger
 Tiny (<50 SLOC) flux implementation for ReactJS with Dependency Injection features.
 
+Leverages React's contexts for passign dependencies automatically down the component tree.
+
 ## Usage
 
 ```javascript
@@ -47,9 +49,7 @@ const todostore = new (class extends Watchable {
 })(todoactions, ['Todo One', 'Todo Two', 'Todo three']);
 
 React.render((
-    <Context
-        todostore={todostore}
-        todoactions={todoactions}>
+    <Context todostore={todostore} todoactions={todoactions}>
         <TodoList />
     </Context>),
     document.body
