@@ -1,6 +1,6 @@
 'use strict';
 
-import React from 'react/addons';
+import React from 'react';
 import { EventEmitter } from 'events';
 
 export class Watchable extends EventEmitter {
@@ -30,7 +30,7 @@ export const ContextFactory = (propTypes) => {
         render() {
             return (<div>{React.Children.map(
                 this.props.children,
-                (child) => React.addons.cloneWithProps(child, this.props)
+                (child) => React.cloneElement(child, this.props)
             )}</div>);
         }
     };
