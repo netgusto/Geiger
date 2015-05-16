@@ -30,7 +30,7 @@ export const ContextFactory = (propTypes) => {
         render() {
             return (<div>{React.Children.map(
                 this.props.children,
-                (child) => React.addons.cloneWithProps(child, self.props)
+                (child) => React.addons.cloneWithProps(child, this.props)
             )}</div>);
         }
     };

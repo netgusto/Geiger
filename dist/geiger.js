@@ -70,11 +70,13 @@ var ContextFactory = function ContextFactory(propTypes) {
         }, {
             key: 'render',
             value: function render() {
+                var _this2 = this;
+
                 return _reactAddons2['default'].createElement(
                     'div',
                     null,
                     _reactAddons2['default'].Children.map(this.props.children, function (child) {
-                        return _reactAddons2['default'].addons.cloneWithProps(child, self.props);
+                        return _reactAddons2['default'].addons.cloneWithProps(child, _this2.props);
                     })
                 );
             }
