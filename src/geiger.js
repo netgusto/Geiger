@@ -1,9 +1,10 @@
 'use strict';
 
-import React from 'react';
 import { EventEmitter } from 'events';
 
-export class Watchable extends EventEmitter {
+export class Action extends EventEmitter { }
+
+export class Store extends EventEmitter {
 
     constructor(...args) {
         super(...args);
@@ -13,39 +14,40 @@ export class Watchable extends EventEmitter {
 
     changed() { this.emit('change'); }
 
-    isDispatching() { return this.dispatching.length > 0; }
-
-    isWaiting() { return this.waiting.length > 0; }
-
     watch(cbk) {
         this.on('change', cbk);
         return () => this.removeListener('change', cbk);
     }
 
+    isDispatching() { return this.dispatching.length > 0; }
+
+    isWaiting() { return this.waiting.length > 0; }
+
     listen(actions, event, cbk) {
 
+        if(typeof actions !== 'object' || typeof actions.on !== 'function') { throw new Error('Store ' + this.constructor.name + '.listen() method expects an EventEmitter-compatible object as a first parameter.'); }
+
         actions.on(event, (...args) => {
+
+            //console.log(this.constructor.name + ':' + event + ':dispatching:begin');
+
             this.dispatching.push(event);
 
             const res = cbk(...args);
             const ispromise = (typeof res === 'object' && typeof res.then === 'function');
 
-            if(this.isWaiting() && !ispromise) {
-                throw new Error('Store ' + this.constructor.name + ' waiting; action has to return a promise');
-            }
+            if(this.isWaiting() && !ispromise) { throw new Error('Store ' + this.constructor.name + ' waiting; action has to return a promise'); }
 
             if(ispromise) {
-                if(!this.isWaiting() || ispromise) {
-                    res.then(() => {
-                        this.dispatching.pop();
-                        this.emit('dispatching:end', event);
-                    });
-                } else {
-                    throw new Error('Store ' + this.constructor.name + ' waiting; action has to return a promise');
-                }
+                res.then(() => {
+                    this.dispatching.pop();
+                    this.emit('dispatching:end', event);
+                    //console.log(this.constructor.name + ':' + event + ':dispatching:end');
+                });
             } else {
                 this.dispatching.pop();
                 this.emit('dispatching:end', event);
+                //console.log(this.constructor.name + ':' + event + ':dispatching:end');
             }
 
             return res;
@@ -56,21 +58,12 @@ export class Watchable extends EventEmitter {
 
         this.waiting.push(true);
 
-        if(!(stores instanceof Array)) { stores = [stores]; }
-
         const promises = [];
-        stores.map(store => {
+
+        (stores instanceof Array ? stores : [stores]).map(store => {
             if(store.isDispatching()) {
-                promises.push(new Promise(resolve => {
-                    const cbk = () => {
-                        store.removeListener('dispatching:end', cbk);
-                        resolve();
-                    };
-                    store.on('dispatching:end', cbk);
-                }));
-            } else {
-                promises.push(new Promise(resolve => resolve()));
-            }
+                promises.push(new Promise(resolve => store.once('dispatching:end', resolve)));
+            } else { promises.push(true); }
         });
 
         return Promise.all(promises).then(() => this.waiting.pop());
@@ -78,6 +71,7 @@ export class Watchable extends EventEmitter {
 }
 
 export const ContextFactory = (propTypes) => {
+
     return class FactoriedContext {
 
         static childContextTypes = propTypes;
@@ -85,17 +79,11 @@ export const ContextFactory = (propTypes) => {
 
         getChildContext() {
             const res = {};
-            for(let propname in propTypes) {
-                res[propname] = this.props[propname];
-            }
+            for(let propname in propTypes) { res[propname] = this.props[propname]; }
             return res;
         }
 
-        render() {
-            return (<div>{React.Children.map(
-                this.props.children,
-                (child) => <child.type {...child.props} />
-            )}</div>);
-        }
+        render() { return this.props.render(); }
     };
+
 };

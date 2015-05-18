@@ -6,32 +6,48 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
-var _reactAddons = require('react/addons');
-
-var _reactAddons2 = _interopRequireDefault(_reactAddons);
-
 var _events = require('events');
 
 'use strict';
 
-var Watchable = (function (_EventEmitter) {
-    function Watchable() {
-        _classCallCheck(this, Watchable);
+var Action = (function (_EventEmitter) {
+    function Action() {
+        _classCallCheck(this, Action);
 
         if (_EventEmitter != null) {
             _EventEmitter.apply(this, arguments);
         }
     }
 
-    _inherits(Watchable, _EventEmitter);
+    _inherits(Action, _EventEmitter);
 
-    _createClass(Watchable, [{
+    return Action;
+})(_events.EventEmitter);
+
+exports.Action = Action;
+
+var Store = (function (_EventEmitter2) {
+    function Store() {
+        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
+        }
+
+        _classCallCheck(this, Store);
+
+        _get(Object.getPrototypeOf(Store.prototype), 'constructor', this).apply(this, args);
+        this.dispatching = [];
+        this.waiting = [];
+    }
+
+    _inherits(Store, _EventEmitter2);
+
+    _createClass(Store, [{
         key: 'changed',
         value: function changed() {
             this.emit('change');
@@ -46,13 +62,87 @@ var Watchable = (function (_EventEmitter) {
                 return _this.removeListener('change', cbk);
             };
         }
+    }, {
+        key: 'isDispatching',
+        value: function isDispatching() {
+            return this.dispatching.length > 0;
+        }
+    }, {
+        key: 'isWaiting',
+        value: function isWaiting() {
+            return this.waiting.length > 0;
+        }
+    }, {
+        key: 'listen',
+        value: function listen(actions, event, cbk) {
+            var _this2 = this;
+
+            if (typeof actions !== 'object' || typeof actions.on !== 'function') {
+                throw new Error('Store ' + this.constructor.name + '.listen() method expects an EventEmitter-compatible object as a first parameter.');
+            }
+
+            actions.on(event, function () {
+                for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+                    args[_key2] = arguments[_key2];
+                }
+
+                //console.log(this.constructor.name + ':' + event + ':dispatching:begin');
+
+                _this2.dispatching.push(event);
+
+                var res = cbk.apply(undefined, args);
+                var ispromise = typeof res === 'object' && typeof res.then === 'function';
+
+                if (_this2.isWaiting() && !ispromise) {
+                    throw new Error('Store ' + _this2.constructor.name + ' waiting; action has to return a promise');
+                }
+
+                if (ispromise) {
+                    res.then(function () {
+                        _this2.dispatching.pop();
+                        _this2.emit('dispatching:end', event);
+                        //console.log(this.constructor.name + ':' + event + ':dispatching:end');
+                    });
+                } else {
+                    _this2.dispatching.pop();
+                    _this2.emit('dispatching:end', event);
+                    //console.log(this.constructor.name + ':' + event + ':dispatching:end');
+                }
+
+                return res;
+            });
+        }
+    }, {
+        key: 'wait',
+        value: function wait(stores) {
+            var _this3 = this;
+
+            this.waiting.push(true);
+
+            var promises = [];
+
+            (stores instanceof Array ? stores : [stores]).map(function (store) {
+                if (store.isDispatching()) {
+                    promises.push(new Promise(function (resolve) {
+                        return store.once('dispatching:end', resolve);
+                    }));
+                } else {
+                    promises.push(true);
+                }
+            });
+
+            return Promise.all(promises).then(function () {
+                return _this3.waiting.pop();
+            });
+        }
     }]);
 
-    return Watchable;
+    return Store;
 })(_events.EventEmitter);
 
-exports.Watchable = Watchable;
+exports.Store = Store;
 var ContextFactory = function ContextFactory(propTypes) {
+
     return (function () {
         function FactoriedContext() {
             _classCallCheck(this, FactoriedContext);
@@ -70,15 +160,7 @@ var ContextFactory = function ContextFactory(propTypes) {
         }, {
             key: 'render',
             value: function render() {
-                var _this2 = this;
-
-                return _reactAddons2['default'].createElement(
-                    'div',
-                    null,
-                    _reactAddons2['default'].Children.map(this.props.children, function (child) {
-                        return _reactAddons2['default'].addons.cloneWithProps(child, _this2.props);
-                    })
-                );
+                return this.props.render();
             }
         }], [{
             key: 'childContextTypes',
