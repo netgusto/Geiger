@@ -6,6 +6,8 @@ Leverages React's (0.13+) contexts for injecting dependencies automatically down
 
 For a full-scale implementation reference, have a look at [IdiomaticReact](https://github.com/netgusto/IdiomaticReact).
 
+<a href="https://www.flickr.com/photos/redfiremg/3952257530" title="Victoreen CD-715 Model 1A by Jonathan Ferber, sur Flickr"><img src="https://c2.staticflickr.com/4/3455/3952257530_c274471191_z.jpg?zz=1" width="640" height="427" alt="Victoreen CD-715 Model 1A"></a>
+
 ## About Geiger
 
 * **Dependency injection**: Services are injected in components, and so are relative to your application context, rather than being used as global services
