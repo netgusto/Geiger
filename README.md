@@ -2,7 +2,7 @@
 
 Tiny (<100 SLOC), no-dependencies Flux implementation with store synchronization (waitFor) and Dependency Injection features.
 
-Leverages React's contexts for injecting dependencies automatically down the component tree.
+Leverages React's (0.13+) contexts for injecting dependencies automatically down the component tree.
 
 For a full-scale implementation reference, have a look at [IdiomaticReact](https://github.com/netgusto/IdiomaticReact).
 
