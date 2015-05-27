@@ -6,7 +6,7 @@ Tiny (<100 SLOC), no-dependencies Flux implementation with store synchronization
 
 Leverages React's (0.13+) contexts for injecting dependencies automatically down the component tree.
 
-For an simple implementation reference, have a look at [Idiomatic React](https://github.com/netgusto/IdiomaticReact).
+For a basic implementation reference, have a look at [Idiomatic React](https://github.com/netgusto/IdiomaticReact).
 
 For a full-scale implementation reference, making use of **multiple synchronized stores**, have a look at [Idiomatic React Chat](https://github.com/netgusto/IdiomaticReact/tree/chat).
 
