@@ -141,6 +141,12 @@ In this example, `waitFor()` returns a promise that'll wait for all given stores
 
 If you need to, you can `waitFor()` for stores that also `waitFor()` for other stores to complete their action handling.
 
+## Test
+
+```
+$ npm test
+```
+
 ## Licence
 
 MIT.
