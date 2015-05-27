@@ -114,7 +114,7 @@ export default class TodoList extends React.Component {
 
 ## Store synchronization
 
-To synchronize store reaction to actions, use the `wait()` method of the store.
+To synchronize store reaction to actions, use the `waitFor()` method of the store.
 
 ```javascript
 'use strict';
@@ -127,7 +127,7 @@ export default class StoreC extends Store {
         super();
 
         this.listen(actions, 'createTodo', (todo) => {
-            return this.wait([storea, storeb]).then(() => {
+            return this.waitFor([storea, storeb]).then(() => {
                 doSomething(todo);
             });
         });
@@ -135,9 +135,9 @@ export default class StoreC extends Store {
 }
 ```
 
-In this example, `wait()` returns a promise that'll wait for all given stores to be idle, and that'll execute `then` when that happens. This promise has to be passed to Geiger (hence the `return`; this is asserted at runtime by Geiger, so no worries).
+In this example, `waitFor()` returns a promise that'll wait for all given stores to be idle, and that'll execute `then` when that happens. This promise has to be passed to Geiger (hence the `return`; this is asserted at runtime by Geiger, so no worries).
 
-If you need to, you can `wait()` for stores that also `wait()` for other stores to complete their action handling.
+If you need to, you can `waitFor()` for stores that also `waitFor()` for other stores to complete their action handling.
 
 ## Licence
 
