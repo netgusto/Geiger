@@ -1,5 +1,7 @@
 # Geiger, the unfancy tool that does the job
 
+[![](https://api.travis-ci.org/netgusto/Geiger.svg?branch=master)](https://travis-ci.org/netgusto/Geiger?branch=master)
+
 Tiny (<100 SLOC), no-dependencies Flux implementation with store synchronization (waitFor) and Dependency Injection features.
 
 Leverages React's (0.13+) contexts for injecting dependencies automatically down the component tree.
