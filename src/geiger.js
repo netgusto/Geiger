@@ -29,32 +29,36 @@ export class Store extends EventEmitter {
 
         actions.on(event, (...args) => {
 
-            //console.log(this.constructor.name + ':' + event + ':dispatching:begin');
-
+            // dispatching begins
             this.dispatching.push(event);
 
             const res = cbk(...args);
             const ispromise = (typeof res === 'object' && typeof res.then === 'function');
 
-            if(this.isWaiting() && !ispromise) { throw new Error('Store ' + this.constructor.name + ' waiting; action has to return a promise'); }
+            if(this.isWaiting() && !ispromise) { throw new Error('Store ' + this.constructor.name + ' waiting; action has to return the waiting promise (the promise returned by waitFor).'); }
 
-            if(ispromise) {
-                res.then(() => {
-                    this.dispatching.pop();
-                    this.emit('dispatching:end', event);
-                    //console.log(this.constructor.name + ':' + event + ':dispatching:end');
-                });
-            } else {
+            const dispatchingEnd = () => {
                 this.dispatching.pop();
                 this.emit('dispatching:end', event);
-                //console.log(this.constructor.name + ':' + event + ':dispatching:end');
+                // dispatching ends
+            };
+
+            if(ispromise) {
+                res.then(dispatchingEnd);
+            } else {
+                dispatchingEnd();
             }
 
             return res;
         });
     }
 
-    wait(stores) {
+    wait(...args) {
+        console.log('Geiger: wait() is deprecated in favour of waitFor(). Please, update your codebase.');
+        return this.waitFor(...args);
+    }
+
+    waitFor(stores) {
 
         this.waiting.push(true);
 
