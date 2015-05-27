@@ -60,7 +60,7 @@ export class Store extends EventEmitter {
 
         const promises = [];
 
-        (stores instanceof Array ? stores : [stores]).map(store => {
+        (Array.isArray(stores) ? stores : [stores]).map(store => {
             if(store.isDispatching()) {
                 promises.push(new Promise(resolve => store.once('dispatching:end', resolve)));
             } else { promises.push(true); }
