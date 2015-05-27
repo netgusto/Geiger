@@ -1,6 +1,6 @@
 'use strict';
 
-import { Action, Store, ContextFactory } from '../../../src/geiger';
+import { Action, Store, ContextFactory } from '../../src/geiger';
 import { expect } from 'chai';
 
 describe('Geiger', function() {

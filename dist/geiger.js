@@ -86,27 +86,26 @@ var Store = (function (_EventEmitter2) {
                     args[_key2] = arguments[_key2];
                 }
 
-                //console.log(this.constructor.name + ':' + event + ':dispatching:begin');
-
+                // dispatching begins
                 _this2.dispatching.push(event);
 
                 var res = cbk.apply(undefined, args);
                 var ispromise = typeof res === 'object' && typeof res.then === 'function';
 
                 if (_this2.isWaiting() && !ispromise) {
-                    throw new Error('Store ' + _this2.constructor.name + ' waiting; action has to return a promise');
+                    throw new Error('Store ' + _this2.constructor.name + ' waiting; action has to return the waiting promise (the promise returned by waitFor).');
                 }
 
-                if (ispromise) {
-                    res.then(function () {
-                        _this2.dispatching.pop();
-                        _this2.emit('dispatching:end', event);
-                        //console.log(this.constructor.name + ':' + event + ':dispatching:end');
-                    });
-                } else {
+                var dispatchingEnd = function dispatchingEnd() {
                     _this2.dispatching.pop();
                     _this2.emit('dispatching:end', event);
-                    //console.log(this.constructor.name + ':' + event + ':dispatching:end');
+                    // dispatching ends
+                };
+
+                if (ispromise) {
+                    res.then(dispatchingEnd);
+                } else {
+                    dispatchingEnd();
                 }
 
                 return res;
@@ -114,14 +113,24 @@ var Store = (function (_EventEmitter2) {
         }
     }, {
         key: 'wait',
-        value: function wait(stores) {
+        value: function wait() {
+            for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+                args[_key3] = arguments[_key3];
+            }
+
+            console.log('Geiger: wait() is deprecated in favour of waitFor(). Please, update your codebase.');
+            return this.waitFor.apply(this, args);
+        }
+    }, {
+        key: 'waitFor',
+        value: function waitFor(stores) {
             var _this3 = this;
 
             this.waiting.push(true);
 
             var promises = [];
 
-            (stores instanceof Array ? stores : [stores]).map(function (store) {
+            (Array.isArray(stores) ? stores : [stores]).map(function (store) {
                 if (store.isDispatching()) {
                     promises.push(new Promise(function (resolve) {
                         return store.once('dispatching:end', resolve);
