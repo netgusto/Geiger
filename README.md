@@ -1,4 +1,4 @@
-# Geiger, the unfancy tool that does the job
+# Geiger, the unfancy flux
 
 [![](https://api.travis-ci.org/netgusto/Geiger.svg?branch=master)](https://travis-ci.org/netgusto/Geiger?branch=master)
 
